@@ -9,7 +9,7 @@ const Nav = ({ siteTitle }) => (
     </a>
 
     <div className="nav-inner">
-      <button className="primary-button pure-button">Compose</button>
+      <button className="primary-button pure-button">{siteTitle}</button>
 
       <div className="pure-menu">
         <ul className="pure-menu-list">

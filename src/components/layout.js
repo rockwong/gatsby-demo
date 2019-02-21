@@ -1,11 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { StaticQuery, graphql } from "gatsby";
-
-import Header from "./header";
 import Nav from "./nav";
 import List from "./list";
-import "./layout.css";
 import "./pure.css";
 import "./email.css";
 
