@@ -24,6 +24,8 @@ export default class Slide extends React.PureComponent {
 
   componentDidMount() {
     this.init();
+    const locationName = window.location.pathname.split('/')[1];
+    this.setState({ activeNav: decodeURI(locationName) });
   }
 
   componentWillReceiveProps(nextProps) {
@@ -32,17 +34,19 @@ export default class Slide extends React.PureComponent {
     }
   }
 
-  listClick = url => e => {
+  itemClick = url => e => {
     e.preventDefault();
     push(url);
   };
 
-  checkIsCurrent = pathname => {
-    return encodeURI(pathname) === globalHistory.location.pathname;
+  navClick = navName => e => {
+    e.preventDefault();
+    this.setState({ activeNav: navName });
   };
 
+  checkIsCurrent = pathname => encodeURI(pathname) === globalHistory.location.pathname;
+
   init = (props = this.props) => {
-    const locationName = location.pathname.split('/')[1];
     const listObjWidthNavName = props.list
       .filter(item => Boolean(item.node.fields.navName))
       .reduce((obj, item, index) => {
@@ -53,12 +57,12 @@ export default class Slide extends React.PureComponent {
         if (index === 16 && !this.state.activeNav) this.setState({ activeNav: navName });
 
         // format date
-        if (item.node.frontmatter.modified) {
-          item.node.frontmatter.modified = moment(item.node.frontmatter.modified).format(
-            'YYYY/DD/MM HH:mm',
-          );
+        const unknownDate = 'Unknown date';
+        const date = item.node.frontmatter.modified;
+        if (date && date !== unknownDate) {
+          item.node.frontmatter.modified = moment(date).format('YYYY/DD/MM HH:mm');
         } else {
-          item.node.frontmatter.modified = 'Unknown date';
+          item.node.frontmatter.modified = unknownDate;
         }
 
         // datalist zip width obj
@@ -77,7 +81,10 @@ export default class Slide extends React.PureComponent {
     const navNameList = Object.keys(listObj);
     const navList = navNameList.map((navName, index) => (
       <li className="pure-menu-item" key={index}>
-        <a className={`pure-menu-link ${activeNav === navName ? 'active' : ''}`}>
+        <a
+          onClick={this.navClick(navName)}
+          className={`pure-menu-link ${activeNav === navName ? 'active' : ''}`}
+        >
           {navName}
           <span className="email-count">({listObj[navName].length})</span>
         </a>
@@ -89,13 +96,13 @@ export default class Slide extends React.PureComponent {
     const excerptListData = listObj[activeNav] || [];
     const excerptList = excerptListData.map(item => (
       <div
-        onClick={this.listClick(item.node.fields.slug)}
+        onClick={this.itemClick(item.node.fields.slug)}
         className={`email-item  pure-g ${
           this.checkIsCurrent(item.node.fields.slug) ? 'email-item-unread email-item-selected' : ''
         }`}
         key={item.node.id}
       >
-        <div className="pure-u-3-4">
+        <div className="pure-u-1">
           <h5 className="email-name">
             {item.node.frontmatter.modified} · {item.node.fields.navName}
           </h5>
@@ -139,127 +146,6 @@ export default class Slide extends React.PureComponent {
         </div>
         <div id="list" className="pure-u-1">
           {excerptList}
-
-          <div className="email-item email-item-unread pure-g">
-            <div className="pure-u">
-              <img
-                width="64"
-                height="64"
-                alt="Eric Ferraiuolo&#x27;s avatar"
-                className="email-avatar"
-                src="img/common/ericf-avatar.png"
-              />
-            </div>
-
-            <div className="pure-u-3-4">
-              <h5 className="email-name">Eric Ferraiuolo</h5>
-              <h4 className="email-subject">Re: Pull Requests</h4>
-              <p className="email-desc">
-                Hey, I had some feedback for pull request #51. We should center the menu so it looks
-                better on mobile.
-              </p>
-            </div>
-          </div>
-
-          <div className="email-item email-item-unread pure-g">
-            <div className="pure-u">
-              <img
-                width="64"
-                height="64"
-                alt="YUI&#x27;s avatar"
-                className="email-avatar"
-                src="img/common/yui-avatar.png"
-              />
-            </div>
-
-            <div className="pure-u-3-4">
-              <h5 className="email-name">YUI Library</h5>
-              <h4 className="email-subject">You have 5 bugs assigned to you</h4>
-              <p className="email-desc">
-                Duis aute irure dolor in reprehenderit in voluptate velit essecillum dolore eu
-                fugiat nulla.
-              </p>
-            </div>
-          </div>
-
-          <div className="email-item pure-g">
-            <div className="pure-u">
-              <img
-                width="64"
-                height="64"
-                alt="Reid Burke&#x27;s avatar"
-                className="email-avatar"
-                src="img/common/reid-avatar.png"
-              />
-            </div>
-
-            <div className="pure-u-3-4">
-              <h5 className="email-name">Reid Burke</h5>
-              <h4 className="email-subject">Re: Design Language</h4>
-              <p className="email-desc">
-                Excepteur sint occaecat cupidatat non proident, sunt in culpa.
-              </p>
-            </div>
-          </div>
-
-          <div className="email-item pure-g">
-            <div className="pure-u">
-              <img
-                width="64"
-                height="64"
-                alt="Andrew Wooldridge&#x27;s avatar"
-                className="email-avatar"
-                src="img/common/andrew-avatar.png"
-              />
-            </div>
-
-            <div className="pure-u-3-4">
-              <h5 className="email-name">Andrew Wooldridge</h5>
-              <h4 className="email-subject">YUI Blog Updates?</h4>
-              <p className="email-desc">
-                Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip.
-              </p>
-            </div>
-          </div>
-
-          <div className="email-item pure-g">
-            <div className="pure-u">
-              <img
-                width="64"
-                height="64"
-                alt="Yahoo! Finance&#x27;s Avatar"
-                className="email-avatar"
-                src="img/common/yfinance-avatar.png"
-              />
-            </div>
-
-            <div className="pure-u-3-4">
-              <h5 className="email-name">Yahoo! Finance</h5>
-              <h4 className="email-subject">How to protect your finances from winter storms</h4>
-              <p className="email-desc">
-                Mauris tempor mi vitae sem aliquet pharetra. Fusce in dui purus, nec malesuada
-                mauris.
-              </p>
-            </div>
-          </div>
-
-          <div className="email-item pure-g">
-            <div className="pure-u">
-              <img
-                width="64"
-                height="64"
-                alt="Yahoo! News&#x27; avatar"
-                className="email-avatar"
-                src="img/common/ynews-avatar.png"
-              />
-            </div>
-
-            <div className="pure-u-3-4">
-              <h5 className="email-name">Yahoo! News</h5>
-              <h4 className="email-subject">Summary for April 3rd, 2012</h4>
-              <p className="email-desc">We found 10 news articles that you may like.</p>
-            </div>
-          </div>
         </div>
       </>
     );

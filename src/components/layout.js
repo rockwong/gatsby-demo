@@ -36,9 +36,7 @@ const Layout = props => (
     render={data => (
       <div id="layout" className="content pure-g">
         <Side siteTitle={data.site.siteMetadata.title} list={data.allMarkdownRemark.edges} />
-        {console.log('layout.js props', props)}
         <div id="main" className="pure-u-1">
-          wwe
           {props.children}
         </div>
       </div>
