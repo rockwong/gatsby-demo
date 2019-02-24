@@ -1,7 +1,7 @@
 ---
 title: 'Wrapping up :tada:'
 pinned: false
-tags: [Notebooks/Tutorial]
+tags: [Notebooks/Welcome]
 ---
 
 # Wrapping up :tada:

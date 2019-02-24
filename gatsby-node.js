@@ -14,26 +14,38 @@ exports.onCreateNode = ({ node, getNode, actions }) => {
   const { createNodeField } = actions;
   const tags = _.get(node, 'frontmatter.tags', []);
   console.log('tags==', tags);
-  if (node.internal.type === `MarkdownRemark` && tags.some(tag => tag.includes('Notebooks'))) {
-    const slug = createFilePath({
+  if (node.internal.type === `MarkdownRemark`) {
+    let slug = createFilePath({
       node,
       getNode,
       basePath: `pages`,
     });
 
-    console.log('slug==');
+    console.log('slug==', slug);
     console.log('tags==', tags);
-    // const tagPath = tags
-    //   .filter(tag => tag.includes('Notebooks'))
-    //   .map(str => str.replace(/Notebooks\//g, ''))
-    //   .join('/');
-    // console.log('tagPath==', tagPath);
-
-    createNodeField({
-      node,
-      name: `slug`,
-      value: slug,
-    });
+    const addSlugField = value =>
+      createNodeField({
+        node,
+        name: `slug`,
+        value,
+      });
+    if (tags.some(tag => tag.includes('Notebooks'))) {
+      tags
+        .filter(tag => tag.includes('Notebooks'))
+        .forEach(str => {
+          const noteStr = str.replace(/Notebooks\//g, '');
+          const navName = noteStr.split('/')[0];
+          createNodeField({
+            node,
+            name: `navName`,
+            value: navName,
+          });
+          const tagPath = slug.replace(/notes/g, noteStr);
+          addSlugField(tagPath);
+        });
+    } else {
+      addSlugField(slug);
+    }
   }
 };
 

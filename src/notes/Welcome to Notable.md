@@ -2,7 +2,7 @@
 title: 'Welcome to Notable :raising_hand_woman:'
 pinned: true
 attachments: [icon.png]
-tags: [Notebooks/Tutorial]
+tags: [Notebooks/Welcome]
 ---
 
 # Welcome to Notable :raising_hand_woman:

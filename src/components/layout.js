@@ -1,10 +1,9 @@
-import React from "react";
-import PropTypes from "prop-types";
-import { StaticQuery, graphql } from "gatsby";
-import Nav from "./nav";
-import List from "./list";
-import "./pure.css";
-import "./email.css";
+import React from 'react';
+import PropTypes from 'prop-types';
+import { StaticQuery, graphql } from 'gatsby';
+import Side from './side';
+import './pure.css';
+import './email.css';
 
 const Layout = ({ children }) => (
   <StaticQuery
@@ -15,12 +14,28 @@ const Layout = ({ children }) => (
             title
           }
         }
+        allMarkdownRemark {
+          edges {
+            node {
+              id
+              frontmatter {
+                title
+                tags
+                modified
+              }
+              fields {
+                slug
+                navName
+              }
+              excerpt
+            }
+          }
+        }
       }
     `}
     render={data => (
       <div id="layout" className="content pure-g">
-        <Nav siteTitle={data.site.siteMetadata.title} />
-        <List siteTitle={data.site.siteMetadata.title} />
+        <Side siteTitle={data.site.siteMetadata.title} list={data.allMarkdownRemark.edges} />
         <div id="main" className="pure-u-1">
           wwe
           {children}
@@ -31,7 +46,7 @@ const Layout = ({ children }) => (
 );
 
 Layout.propTypes = {
-  children: PropTypes.node.isRequired
+  children: PropTypes.node.isRequired,
 };
 
 export default Layout;
