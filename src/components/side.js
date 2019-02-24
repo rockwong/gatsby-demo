@@ -1,7 +1,10 @@
-import { Link } from 'gatsby';
+import { Link, push } from 'gatsby';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import React from 'react';
+import { Match, globalHistory } from '@reach/router';
+
+console.log('globalHistory==', globalHistory);
 
 export default class Slide extends React.PureComponent {
   static propTypes = {
@@ -20,16 +23,26 @@ export default class Slide extends React.PureComponent {
   };
 
   componentDidMount() {
-    this.initListObj();
+    this.init();
   }
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.list !== this.props.list) {
-      this.initListObj(nextProps);
+      this.init(nextProps);
     }
   }
 
-  initListObj = (props = this.props) => {
+  listClick = url => e => {
+    e.preventDefault();
+    push(url);
+  };
+
+  checkIsCurrent = pathname => {
+    return encodeURI(pathname) === globalHistory.location.pathname;
+  };
+
+  init = (props = this.props) => {
+    const locationName = location.pathname.split('/')[1];
     const listObjWidthNavName = props.list
       .filter(item => Boolean(item.node.fields.navName))
       .reduce((obj, item, index) => {
@@ -58,32 +71,36 @@ export default class Slide extends React.PureComponent {
 
   render() {
     const { siteTitle } = this.props;
-    const { activeNav } = this.state;
-
+    const { activeNav, listObj } = this.state;
+    console.log('slide props=', this.props);
     // nav list
-    const navNameList = Object.keys(this.state.listObj);
+    const navNameList = Object.keys(listObj);
     const navList = navNameList.map((navName, index) => (
       <li className="pure-menu-item" key={index}>
-        <a href="#" className={`pure-menu-link ${activeNav === navName ? 'active' : ''}`}>
+        <a className={`pure-menu-link ${activeNav === navName ? 'active' : ''}`}>
           {navName}
-          <span className="email-count">({this.state.listObj[navName].length})</span>
+          <span className="email-count">({listObj[navName].length})</span>
         </a>
       </li>
     ));
 
-    // excerpt list
+    // excerpt list1
     console.log('activeNav==', activeNav);
-    const excerptListData = this.state.listObj[activeNav] || [];
+    const excerptListData = listObj[activeNav] || [];
     const excerptList = excerptListData.map(item => (
-      <div className="email-item email-item-selected pure-g" key={item.node.id}>
+      <div
+        onClick={this.listClick(item.node.fields.slug)}
+        className={`email-item  pure-g ${
+          this.checkIsCurrent(item.node.fields.slug) ? 'email-item-unread email-item-selected' : ''
+        }`}
+        key={item.node.id}
+      >
         <div className="pure-u-3-4">
           <h5 className="email-name">
             {item.node.frontmatter.modified} · {item.node.fields.navName}
           </h5>
-          <h4 className="email-subject">Hello from Toronto</h4>
-          <p className="email-desc">
-            Hey, I just wanted to check in with you from Toronto. I got here earlier today.
-          </p>
+          <h4 className="email-subject">{item.node.frontmatter.title}</h4>
+          <p className="email-desc">{item.node.excerpt}</p>
         </div>
       </div>
     ));
@@ -107,7 +124,7 @@ export default class Slide extends React.PureComponent {
                 <li className="pure-menu-item">
                   <a href="#" className="pure-menu-link">
                     <span className="email-label-personal" />
-                    About me
+                    About
                   </a>
                 </li>
                 <li className="pure-menu-item">
@@ -122,15 +139,6 @@ export default class Slide extends React.PureComponent {
         </div>
         <div id="list" className="pure-u-1">
           {excerptList}
-          <div className="email-item email-item-selected pure-g">
-            <div className="pure-u-3-4">
-              <h5 className="email-name">Tilo Mitra</h5>
-              <h4 className="email-subject">Hello from Toronto</h4>
-              <p className="email-desc">
-                Hey, I just wanted to check in with you from Toronto. I got here earlier today.
-              </p>
-            </div>
-          </div>
 
           <div className="email-item email-item-unread pure-g">
             <div className="pure-u">

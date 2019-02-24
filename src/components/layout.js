@@ -5,7 +5,7 @@ import Side from './side';
 import './pure.css';
 import './email.css';
 
-const Layout = ({ children }) => (
+const Layout = props => (
   <StaticQuery
     query={graphql`
       query SiteTitleQuery {
@@ -36,9 +36,10 @@ const Layout = ({ children }) => (
     render={data => (
       <div id="layout" className="content pure-g">
         <Side siteTitle={data.site.siteMetadata.title} list={data.allMarkdownRemark.edges} />
+        {console.log('layout.js props', props)}
         <div id="main" className="pure-u-1">
           wwe
-          {children}
+          {props.children}
         </div>
       </div>
     )}
