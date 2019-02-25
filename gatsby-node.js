@@ -10,41 +10,39 @@ const _ = require(`lodash`);
 const { createFilePath } = require(`gatsby-source-filesystem`);
 
 exports.onCreateNode = ({ node, getNode, actions }) => {
-  console.log('node.internal.type==', node.internal.type);
   const { createNodeField } = actions;
   const tags = _.get(node, 'frontmatter.tags', []);
-  console.log('tags==', tags);
   if (node.internal.type === `MarkdownRemark`) {
-    let slug = createFilePath({
+    const slug = createFilePath({
       node,
       getNode,
       basePath: `pages`,
     });
+    createNodeField({
+      node,
+      name: `slug`,
+      value: slug,
+    });
 
-    console.log('slug==', slug);
-    console.log('tags==', tags);
-    const addSlugField = value =>
-      createNodeField({
-        node,
-        name: `slug`,
-        value,
-      });
     if (tags.some(tag => tag.includes('Notebooks'))) {
       tags
         .filter(tag => tag.includes('Notebooks'))
         .forEach(str => {
           const noteStr = str.replace(/Notebooks\//g, '');
           const navName = noteStr.split('/')[0];
+          const tagPath = slug.replace(/notes/g, noteStr);
+          console.log('tagPath==', tagPath);
           createNodeField({
             node,
             name: `navName`,
             value: navName,
           });
-          const tagPath = slug.replace(/notes/g, noteStr);
-          addSlugField(tagPath);
+          createNodeField({
+            node,
+            name: `tagPath`,
+            value: tagPath,
+          });
         });
-    } else {
-      addSlugField(slug);
     }
   }
 };
@@ -58,6 +56,7 @@ exports.createPages = ({ graphql, actions }) => {
           node {
             fields {
               slug
+              tagPath
             }
           }
         }
@@ -65,14 +64,15 @@ exports.createPages = ({ graphql, actions }) => {
     }
   `).then(result => {
     result.data.allMarkdownRemark.edges.forEach(({ node }) => {
-      if (node.fields && node.fields.slug) {
+      if (node.fields && node.fields.tagPath) {
         createPage({
-          path: node.fields.slug,
+          path: node.fields.tagPath,
           component: path.resolve(`./src/templates/blog-post.js`),
           context: {
             // Data passed to context is available
             // in page queries as GraphQL variables.
             slug: node.fields.slug,
+            tagPath: node.fields.tagPath,
           },
         });
       }

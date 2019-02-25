@@ -1,5 +1,5 @@
 ---
-title: 'Welcome to Notable :raising_hand_woman:'
+title: ' :person_raising_hand: Welcome to Notable :raising_hand_woman:'
 pinned: true
 attachments: [icon.png]
 tags: [Notebooks/Welcome]

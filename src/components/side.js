@@ -3,6 +3,9 @@ import PropTypes from 'prop-types';
 import moment from 'moment';
 import React from 'react';
 import { Match, globalHistory } from '@reach/router';
+import emoji from 'emojione';
+
+console.log('emojione===', emoji);
 
 console.log('globalHistory==', globalHistory);
 
@@ -25,7 +28,8 @@ export default class Slide extends React.PureComponent {
   componentDidMount() {
     this.init();
     const locationName = window.location.pathname.split('/')[1];
-    this.setState({ activeNav: decodeURI(locationName) });
+    const decodeName = decodeURI(locationName);
+    if (decodeName) this.setState({ activeNav: decodeName });
   }
 
   componentWillReceiveProps(nextProps) {
@@ -54,7 +58,7 @@ export default class Slide extends React.PureComponent {
 
         // init activeNav
         console.log('index==', index, ' navName==', navName);
-        if (index === 16 && !this.state.activeNav) this.setState({ activeNav: navName });
+        if (index === 0 && !this.state.activeNav) this.setState({ activeNav: navName });
 
         // format date
         const unknownDate = 'Unknown date';
@@ -92,13 +96,15 @@ export default class Slide extends React.PureComponent {
     ));
 
     // excerpt list1
-    console.log('activeNav==', activeNav);
+    console.log('this.state==', this.state);
     const excerptListData = listObj[activeNav] || [];
     const excerptList = excerptListData.map(item => (
       <div
-        onClick={this.itemClick(item.node.fields.slug)}
+        onClick={this.itemClick(item.node.fields.tagPath)}
         className={`email-item  pure-g ${
-          this.checkIsCurrent(item.node.fields.slug) ? 'email-item-unread email-item-selected' : ''
+          this.checkIsCurrent(item.node.fields.tagPath)
+            ? 'email-item-unread email-item-selected'
+            : ''
         }`}
         key={item.node.id}
       >
@@ -106,7 +112,10 @@ export default class Slide extends React.PureComponent {
           <h5 className="email-name">
             {item.node.frontmatter.modified} · {item.node.fields.navName}
           </h5>
-          <h4 className="email-subject">{item.node.frontmatter.title}</h4>
+          <h4
+            className="email-subject"
+            dangerouslySetInnerHTML={{ __html: emoji.toImage(item.node.frontmatter.title) }}
+          />
           <p className="email-desc">{item.node.excerpt}</p>
         </div>
       </div>

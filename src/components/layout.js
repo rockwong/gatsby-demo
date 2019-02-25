@@ -26,6 +26,7 @@ const Layout = props => (
               fields {
                 slug
                 navName
+                tagPath
               }
               excerpt
             }
